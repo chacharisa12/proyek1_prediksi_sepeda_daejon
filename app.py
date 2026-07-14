@@ -20,6 +20,8 @@ def load_model():
 
 model = load_model()
 
+API_LIMIT = date(2026, 7, 29)
+
 @st.cache_data(ttl=600)
 def get_weather(selected_date, selected_hour):
 
@@ -120,11 +122,22 @@ hour = st.slider(
     12
 )
 
-weather = get_weather(tanggal, hour)
+if tanggal <= API_LIMIT:
+    weather = get_weather(tanggal, hour)
 
-if weather is None:
-    st.error("❌ Gagal mengambil data cuaca.")
-    st.stop()
+    if weather is None:
+        st.error("❌ Gagal mengambil data cuaca.")
+        st.stop()
+
+    st.success("✅ Data cuaca berhasil diambil dari Open-Meteo.")
+
+else:
+    weather = None
+
+    st.warning(
+        "⚠️ Data cuaca untuk tanggal ini belum tersedia di Open-Meteo.\n"
+        "Silakan masukkan data cuaca secara manual."
+    )
 
 # Feature otomatis
 year = tanggal.year
@@ -134,26 +147,32 @@ day_of_week = tanggal.weekday()
 is_weekend = 1 if day_of_week >= 5 else 0
 
 # hahhhhh
-st.info(
-    f"""
+if weather:
+    st.info(
+        f"""
 📍 Daejeon
 
 📅 {tanggal}
 
 🕒 {hour}:00
 
-Data cuaca berhasil diambil dari Open-Meteo
+✅ Data cuaca diambil otomatis dari Open-Meteo.
 """
-)
+    )
+else:
+    st.info(
+        f"""
+📍 Daejeon
+
+📅 {tanggal}
+
+🕒 {hour}:00
+
+✍️ Data cuaca dimasukkan secara manual.
+"""
+    )
 
 # INPUT CUACA
-
-weather = get_weather(tanggal, hour)
-
-if weather is None:
-    st.error("❌ Gagal mengambil data cuaca.")
-    st.stop()
-
 st.subheader("🌦 Kondisi Cuaca")
 
 col1, col2 = st.columns(2)
@@ -162,61 +181,54 @@ with col1:
 
     temperature = st.number_input(
     "Temperature (°C)",
-    value=float(weather["temperature"]))
+    value=float(weather["temperature"]) if weather else 20.0)
 
     humidity = st.number_input(
-        "Humidity (%)",
-        min_value=0.0,
-        max_value=100.0,
-        value=float(weather["humidity"])
-    )
+    "Humidity (%)",
+    min_value=0.0,
+    max_value=100.0,
+    value=float(weather["humidity"]) if weather else 60.0)
 
     windspeed = st.number_input(
-        "Wind Speed (m/s)",
-        value=float(weather["windspeed"])
-    )
+    "Wind Speed (m/s)",
+    value=float(weather["windspeed"]) if weather else 2.0)
 
     precipitation = st.number_input(
-        "Precipitation",
-        value=float(weather["precipitation"])
-    )
+    "Precipitation",
+    value=float(weather["precipitation"]) if weather else 0.0)
 
     sunshine = st.number_input(
-        "Sunshine",
-        value=5.0
-    )
+    "Sunshine",
+    min_value=0.0,
+    max_value=1.0,
+    value=0.0,
+    step=0.1)
 
     snowfall = st.number_input(
-        "Snowfall",
-        value=float(weather["snowfall"])
-    )
+    "Snowfall",
+    value=float(weather["snowfall"]) if weather else 0.0)
 
 with col2:
 
     dew_point = st.number_input(
-        "Dew Point",
-        value=float(weather["dew_point"])
-    )
+    "Dew Point",
+    value=float(weather["dew_point"]) if weather else 15.0)
 
     solar_radiation = st.number_input(
-        "Solar Radiation",
-        value=float(weather["solar_radiation"])
-    )
+    "Solar Radiation",
+    value=float(weather["solar_radiation"]) if weather else 300.0)
 
     cloud_cover = st.number_input(
-        "Cloud Cover",
-        value=float(weather["cloud_cover"])
-    )
-
+    "Cloud Cover",
+    value=float(weather["cloud_cover"]) if weather else 30.0)
+    
     visibility = st.number_input(
-        "Visibility",
-        value=float(weather["visibility"]) if weather["visibility"] is not None else 1500.0
-    )
+    "Visibility",
+    value=float(weather["visibility"]) if weather else 1500.0)
 
     ground_temp = st.number_input(
-        "Ground Temperature",
-        value=round(float(weather["temperature"]) + 2.97, 1)
-    )
+    "Ground Temperature",
+    value=round(float(weather["temperature"]) + 2.97, 1) if weather else 23.0)
 
 # HOLIDAY
 
