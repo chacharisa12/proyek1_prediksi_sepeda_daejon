@@ -23,6 +23,17 @@ model = load_model()
 
 API_LIMIT = date(2026, 7, 29)
 kr_holidays = holidays.country_holidays("KR")
+holiday_translation = {
+    "신정": "New Year's Day",
+    "설날": "Lunar New Year",
+    "삼일절": "Independence Movement Day",
+    "어린이날": "Children's Day",
+    "현충일": "Memorial Day",
+    "광복절": "Liberation Day",
+    "개천절": "National Foundation Day",
+    "한글날": "Hangul Day",
+    "성탄절": "Christmas Day"
+}
 
 @st.cache_data(ttl=600)
 def get_weather(selected_date, selected_hour):
@@ -238,10 +249,12 @@ st.subheader("🎉 Hari Libur")
 
 holiday = 1 if tanggal in kr_holidays else 0
 
-if holiday:
-    st.success(
-        "🇰🇷 Hari Libur Nasional: " + str(kr_holidays[tanggal])
-    )
+nama = str(kr_holidays[tanggal])
+
+for korea, english in holiday_translation.items():
+    if korea in nama:
+        nama = english
+    st.success(f"🇰🇷 Hari Libur Nasional: {nama}")
 else:
     st.info("📅 Bukan Hari Libur Nasional Korea Selatan.")
 
