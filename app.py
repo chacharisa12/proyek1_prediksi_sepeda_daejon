@@ -247,16 +247,27 @@ with col2:
 
 st.subheader("🎉 Hari Libur")
 
+# HOLIDAY
+
 holiday = 1 if tanggal in kr_holidays else 0
 
-nama = str(kr_holidays[tanggal])
+if holiday:
 
-for korea, english in holiday_translation.items():
-    if korea in nama:
-        nama = english
-    st.success(f"🇰🇷 Hari Libur Nasional: {nama}")
+    nama = str(kr_holidays[tanggal])
+
+    for korea, english in holiday_translation.items():
+        if korea in nama:
+            nama = english
+
+    st.success(
+        f"🇰🇷 Hari Libur Nasional: {nama}"
+    )
+
 else:
-    st.info("📅 Bukan Hari Libur Nasional Korea Selatan.")
+
+    st.info(
+        "📅 Bukan Hari Libur Nasional Korea Selatan."
+    )
 
 # PREDIKSI
 
