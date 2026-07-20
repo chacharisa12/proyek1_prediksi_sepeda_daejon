@@ -226,7 +226,7 @@ with col2:
     
     visibility = st.number_input(
     "Visibility",
-    value=float(weather["visibility"]) if weather and weather["visibility"] is not None else 3223.32)
+    value=float(weather["visibility"]) if weather and weather["visibility"] is not None else 3223.3)
 
     ground_temp = st.number_input(
     "Ground Temperature",
