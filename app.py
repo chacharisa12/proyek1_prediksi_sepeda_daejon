@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import joblib
 import requests
+import holidays
 from datetime import date, datetime
 
 # CONFIG
@@ -21,6 +22,7 @@ def load_model():
 model = load_model()
 
 API_LIMIT = date(2026, 7, 29)
+kr_holidays = holidays.country_holidays("KR")
 
 @st.cache_data(ttl=600)
 def get_weather(selected_date, selected_hour):
@@ -224,7 +226,7 @@ with col2:
     
     visibility = st.number_input(
     "Visibility",
-    value=float(weather["visibility"]) if weather else 1500.0)
+    value=float(weather["visibility"]) if weather and weather["visibility"] is not None else 3223.32)
 
     ground_temp = st.number_input(
     "Ground Temperature",
@@ -234,12 +236,12 @@ with col2:
 
 st.subheader("🎉 Hari Libur")
 
-holiday_text = st.selectbox(
-    "Apakah Hari Libur?",
-    ["Tidak", "Ya"]
-)
+holiday = 1 if tanggal in kr_holidays else 0
 
-holiday = 1 if holiday_text == "Ya" else 0
+if holiday:
+    st.success(f"🇰🇷 Hari Libur Nasional: {kr_holidays[tanggal]}")
+else:
+    st.info("📅 Bukan Hari Libur Nasional Korea Selatan.")
 
 # PREDIKSI
 
