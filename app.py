@@ -238,6 +238,26 @@ st.subheader("🎉 Hari Libur")
 
 holiday = 1 if tanggal in kr_holidays else 0
 
+holiday_translation = {
+    "신정연휴": "New Year's Holiday",
+    "설날": "Lunar New Year",
+    "추석": "Chuseok",
+    "어린이날": "Children's Day",
+    "현충일": "Memorial Day",
+    "광복절": "Liberation Day",
+    "개천절": "National Foundation Day",
+    "한글날": "Hangul Day",
+    "크리스마스": "Christmas Day"
+}
+
+# translate holiday name
+holiday_display = holiday_translation.get(
+    holiday,
+    holiday
+)
+
+st.write(f"🇰🇷 National Holiday: {holiday_display}")
+
 if holiday:
     st.success(f"🇰🇷 Hari Libur Nasional: {kr_holidays[tanggal]}")
 else:
