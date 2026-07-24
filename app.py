@@ -4,14 +4,16 @@ import joblib
 import requests
 import holidays
 from datetime import date, datetime
+import os
 
 # CONFIG
 
 st.set_page_config(
     page_title="Prediksi Penyewaan Sepeda",
     page_icon="🚲",
-    layout="centered"
-)
+    layout="centered")
+if "history" not in st.session_state:
+    st.session_state.history = []
 
 # LOAD MODEL
 
@@ -295,6 +297,29 @@ if st.button("🔮 Prediksi"):
 
     prediksi = model.predict(input_data)[0]
 
+    hasil = pd.DataFrame([{"Tanggal": tanggal,
+                           "Jam": hour,
+                           "Temperature": temperature,
+                           "Humidity": humidity,
+                           "Wind Speed": windspeed,
+                           "Prediksi": round(prediksi)}])
+    if os.path.exists("history_prediksi.csv"):hasil.to_csv(
+        "history_prediksi.csv",
+        mode="a",
+        header=False,
+        index=False)
+    else:
+        hasil.to_csv(
+        "history_prediksi.csv",
+        index=False)
+
+    st.session_state.history.append({
+    "Tanggal": tanggal,
+    "Jam": hour,
+    "Prediksi": round(prediksi),
+    "Temperature": temperature,
+    "Humidity": humidity})
+
     st.divider()
 
     st.subheader("📊 Hasil Prediksi")
@@ -316,3 +341,22 @@ if st.button("🔮 Prediksi"):
     st.subheader("📋 Ringkasan Input")
 
     st.dataframe(input_data)
+
+if os.path.exists("history_prediksi.csv"):
+
+    history = pd.read_csv("history_prediksi.csv")
+
+    st.divider()
+    st.subheader("📈 Riwayat Prediksi")
+
+    history["Datetime"] = pd.to_datetime(
+        history["Tanggal"] + " " + history["Jam"].astype(str) + ":00"
+    )
+
+    history = history.sort_values("Datetime")
+
+    st.line_chart(
+        history.set_index("Datetime")["Prediksi"]
+    )
+
+    st.dataframe(history)
